@@ -36,5 +36,48 @@ water <-data.frame(stream, fishes)
 
 View(water)
 
+# from now on we are going to import/export data
+
+setwd("/Users/viktoriasitnik/Documents/R/lab/")
+
+# let's export the table
+
+write.table(water, file = "myfirsttable.txt")
+
+# it's now in the folder, wow
+# colleague sent me a dataset, how to import it into R?
+
+read.table("myfirsttable.txt")
+
+# assign table to an object
+
+viktoriatable <-read.table("myfirsttable.txt")
+
+# let's start with statistics for lazy beautiful people (no need to find avg, mean, med etc. separately)
+# create object summary 
+
+summary(viktoriatable)
+
+# creating summary of only one variable e.g in our case "fishes"
+# $
+
+summary(viktoriatable$fishes)
+
+# create a histogram for fishes data using hist function
+
+hist(fishes)
+
+# do the same for stream
+
+hist(stream)
+
+
+
+
+
+
+
+
+
 
 
