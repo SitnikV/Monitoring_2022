@@ -2,7 +2,7 @@
 ## satellite images from https://land.copernicus.eu/global/hsm are used ##
 # Data used 1 km Global V1
 # FPAR 06/01/2014,26/03/2014, 06/01/2018, 15/03/2018, 06/01/2020, 21/03/2020
-# SCE 09/01/2018, 21/03/2018,, 09/01/2020, 21/03/2020
+# SCE 09/01/2018, 21/03/2018, 09/01/2020, 21/03/2020
 # ALDH 06/01/2014, 06/01/2018, 06/01/2020
 
 setwd("/Users/viktoriasitnik/Documents/R/lab/copernicus/monitoring_exam")
@@ -90,8 +90,12 @@ library(cowplot)
 plot_grid(sj18,sm18,sj20,sm20, labels=c("A","B","C","D"))
 
         
+
 sm18 <-ggplot() + geom_raster(sm18_estonia,mapping = aes(x=x ,y=y, fill=Snow.Cover.Extent))+
-  scale_fill_viridis(option="viridis") + ggtitle("Snow cover 21.03.2018")
+  scale_fill_viridis(option="viridis") + labs(x = "latitude", y = "longitudel", title ="Snow cover 21.03.2018")
+                                              
+# subtitle = "Add a subtitle below title", caption = "Add a caption below plot"
+
 
 sm20 <- ggplot() + geom_raster(sm20_estonia, mapping = aes(x=x ,y=y, fill=Snow.Cover.Extent))+
  scale_fill_viridis(option="viridis") + ggtitle("Snow cover 21.03.2020")
@@ -131,6 +135,7 @@ plot(fparjan20)
 fparmar20 <-raster("c_gls_FAPAR-RT6_202003100000_GLOBE_PROBAV_V2.0.1.nc ")
 fm20_estonia <-crop(fparmar20, ext)
 plot(fm20_estonia)
+
 
 
 fpar_estonia <-c(fparjan14,fparmar14,fparjan18, fparmar18,fparjan20,fparmar20)
@@ -216,8 +221,122 @@ plot(cor_jan20,xlab = "latitude", ylab="longitude",col=cl,main=" January 2020")
 plot(cor_mar20,xlab = "latitude", ylab="longitude",col=cl,main=" March 2018")
 
 
+## export code from .txt file!! ##
 
 
-## IN CASE OF AN ERROR: Error in plot.new() : figure margins too large ##
-par("mar")
-par(mar=c(1,1,1,1))
+## QGIS DATA ##
+library(raster)
+library(tiff)
+# create vector for forest cover 2018
+forest_cover18 <-raster("Treecover_2018_merged.tif")
+imperviousness18 <-raster("hhhhh.tif")
+
+
+
+### Quantifying area of active photosynthesis in Estonian bog ###
+
+setwd("/Users/viktoriasitnik/Documents/R/lab/copernicus/monitoring_exam")
+library(raster)
+library(RStoolbox) # package for classification process
+library(ggplot2) # plotting
+
+rlist <- list.files(pattern="PS")
+list_rast <- lapply(rlist, brick) # brick because multiband file
+list_rast
+
+# sqd. brackets to specify an object from a list
+
+plot(list_rast[[1]])
+plot(list_rast[[2]])
+
+
+
+# creating objects 
+
+ps_summer <- list_rast[[1]]
+ps_winter <- list_rast[[2]]
+
+plotRGB(ps_summer, r=1, g=2, b=3, stretch="lin")
+
+# unsupervised to let the software run the analysis
+ps_summer_c <- unsuperClass(ps_summer, nClasses = 2) # unsuperClass (x, nClasses)
+
+
+# nClasses = the amount of classes you want to use, in our class 2 (forest&agriculture)
+# what class the value number represents
+plot(ps_summer_c$map) 
+
+# 2 green areas, high photosynthesis 1, no green vegetation
+# create frequency table 
+
+freq(ps_summer_c$map) # 1- 760395; 2- 420405 (in pixels)
+
+# find relative frequencies
+760395 + 420405
+total <- c(1180800)
+propveg_summer <- 420405/total # ca. 0.356
+propnoveg_summer <- 760395/total  # ca. 0.644
+ 
+cover <- c("vegetation", "no vegetation")
+# use variables instead of values
+prop_summer <-c(propveg_summer,propnoveg_summer)
+propveg_summer
+propnoveg_summer 
+
+proportions_summer <-data.frame(cover, proportions)
+proportions_summer
+
+ggplot(proportions_summer, aes(x=cover, y=proportions, color=cover)) + geom_bar(stat="identity", fill="white")
+
+# repeat same for the winter data
+plotRGB(ps_winter, r=1, g=2, b=3, stretch="lin")
+ps_winter_c <- unsuperClass(ps_winter, nClasses = 2) # computer calculated the proportions of two classes
+ps_winter_c
+plot(ps_winter_c$map) # oh wow, active ps even during winter
+freq(ps_winter_c$map)
+
+773605 + 407195
+
+total <- 1180800
+propveg_winter <- 407196/total
+propnoveg_winter <- 773605/total
+prop_winter <-c(propveg_winter, propnoveg_winter)
+
+
+proportion <- data.frame(cover,prop_summer, prop_winter)
+
+library(gridExtra)
+ggplot(proportion, aes(x=cover, y=prop_winter, color=cover)) + geom_bar(stat="identity", fill="white")
+
+# plotting altogether
+
+s <- ggplot(proportions_summer, aes(x=cover, y=proportions, color=cover)) + geom_bar(stat="identity", fill="white")
+w <- ggplot(proportion, aes(x=cover, y=prop_winter, color=cover)) + geom_bar(stat="identity", fill="white")
+
+# gridExtra provides a number of user-level functions to work with "grid" graphics, notably to arrange multiple grid-based plots on a page, and draw tables.
+# grid.arrange (p1, p2, nrows=1)
+grid.arrange(s, w, ncol=2) # no significant changes in vegetation can be seen
+
+
+
+### tree cover density and impreviousness ###
+setwd("/Users/viktoriasitnik/Documents/R/lab/copernicus/monitoring_exam/Sitnik_tif")
+rlist <-list.files(pattern="Treecover_2018_merged.tif")
+
+tree <- raster("Treecover_2018_merged.tif")
+plot(tree)
+
+ex <- extent(c(5050000, 5080000, 3090000, 4100000))
+tree_crop <- crop(tree, ex)
+df_tree <- as.data.frame(tree_crop, xy=TRUE)
+p1 <- df_tree[df_tree$Treecover_2018_merged==1,] # 1 should be the value for forest, if not you should use the right value of forest
+p1_raster <- rasterFromXYZ(p1, res=c(10,10), crs= "+proj=utm +ellps=WGS84 +datum=WGS84 +no_defs") #or if doesn't work only p1_raster <- rasterFromXYZ(p1)
+
+plot(p1)
+plot(tree_crop)
+
+
+# impreviousness file
+rlist <-list.files(pattern="hhhhh.tif")
+impr <- raster("hhhhh.tif")
+plot(impr)
