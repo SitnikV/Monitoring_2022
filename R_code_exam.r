@@ -317,26 +317,100 @@ w <- ggplot(proportion, aes(x=cover, y=prop_winter, color=cover)) + geom_bar(sta
 # grid.arrange (p1, p2, nrows=1)
 grid.arrange(s, w, ncol=2) # no significant changes in vegetation can be seen
 
+# read code from .txt (Word) file
+setwd("/Users/viktoriasitnik/Documents/R/lab/copernicus/monitoring_exam")
 
 
-### tree cover density and impreviousness ###
-setwd("/Users/viktoriasitnik/Documents/R/lab/copernicus/monitoring_exam/Sitnik_tif")
-rlist <-list.files(pattern="Treecover_2018_merged.tif")
+green_capital23 <-read.delim("gc23.txt") 
+green_capital23
 
-tree <- raster("Treecover_2018_merged.tif")
-plot(tree)
+# works
 
-ex <- extent(c(5050000, 5080000, 3090000, 4100000))
-tree_crop <- crop(tree, ex)
-df_tree <- as.data.frame(tree_crop, xy=TRUE)
-p1 <- df_tree[df_tree$Treecover_2018_merged==1,] # 1 should be the value for forest, if not you should use the right value of forest
-p1_raster <- rasterFromXYZ(p1, res=c(10,10), crs= "+proj=utm +ellps=WGS84 +datum=WGS84 +no_defs") #or if doesn't work only p1_raster <- rasterFromXYZ(p1)
+### amount of green areas in tallinn city centre 2017- 2021 ###
+# tallinn is the green capital of europe 2023 lets find out whether it is maintaining its green areas ###
+### ADD CODE THROUGH WORD FILE AND MODIFY GRAPHS ###
 
-plot(p1)
-plot(tree_crop)
+library(raster)
+library(RStoolbox) 
+library(ggplot2)
+
+setwd("/Users/viktoriasitnik/Documents/R/lab/copernicus/monitoring_exam")
+rlist <- list.files(pattern="Sentinel")
+
+list_rast <- lapply(rlist, brick) # multilayer file
+list_rast  # [[1]] 06.06..2017, [[2]] 06.06/2021
+
+# create objects
+
+tln17 = stack(list_rast[[1]])  # 4 bands in total 
+tln21 = stack(list_rast[[2]])
+tln17
+plot(tln17)
 
 
-# impreviousness file
-rlist <-list.files(pattern="hhhhh.tif")
-impr <- raster("hhhhh.tif")
-plot(impr)
+# create a map of pixels where green is greater than red or blue
+par(mfrow=c(2,1))
+
+# for 2017 and assign it to an object gtln17
+gtln17 <- plot(tln17[[2]]>tln17[[1]]) & (tln17[[2]] > tln17[[3]]) 
+
+# and for 2021 and assign it to an object gtln21
+
+gtln21 <- plot(tln21[[2]]>tln21[[1]]) & (tln21[[2]] > tln21[[3]])
+
+
+# plotRGB can be used to create true/false colour images 
+library(patchwork)
+par(mfrow=c(2,1))
+p17 <- plotRGB(tln17, r=1, g=2, b=3, stretch="lin", main= "Tallinn 06.06.2017")
+
+p21 <- plotRGB(tln21, r=1, g=2, b=3, stretch="lin", main= "Tallinn 06.06.2021")
+
+tln17 = stack(list_rast[[1]])  # 4 bands in total 
+tln21 = stack(list_rast[[2]])
+
+p17/p21
+# quantify 
+rlist <- list.files(pattern = "BUBA")
+list_rast <- lapply(rlist, brick)
+list_rast # [[1]] 2017, [[2]] 2021
+
+tln17 <- list_rast[[1]]
+tln17_c
+tln21 <- list_rast[[2]]
+
+tln17_c <- unsuperClass(tln17, nClasses = 2)
+plot(tln17_c$map) #  1 no green, 2 green (NB!)
+freq(tln17_c$map)
+
+
+tln21_c <- unsuperClass(tln21, nClasses = 2)
+plot(tln21_c$map) # 1 no green, 2 green (NB)
+freq(tln21_c$map) 
+
+total <- 162642+111039
+total
+freq_green_17 <- 97962/total    
+freq_green_17 #   0.3579423
+
+
+freq_green_21 <- 111039/total
+freq_green_21 # 0.4057242
+
+0.4057242 - 0.3579423
+
+## 0.0477819 ca. 4.8% of green areas have been gained in the period between 2017 and 2021 ##
+
+#  0.4585586 
+
+0.4662966-0.4585586
+
+# ca.0.8% of green areas have been lost between 2017-2021
+
+box(col="white") # add borders # didnt use in the end
+
+### comparison between 2018 and 2021 winter quantify energy and albedo, is it stronger with plot with lower energy? ###
+### correlation between vegetation in spring 2018 and 2021 and albedo ###
+
+
+### done ###
