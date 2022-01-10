@@ -68,3 +68,7 @@ file # you get the path to the data
 species <-shapefile(file)
 
 plot(species, pch=19, col="red") # pch is for character, in this case 19= round
+
+## 10.01.2021 lesson, working with species presence/absence data ## 
+
+
