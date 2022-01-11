@@ -69,4 +69,32 @@ plot(preds$precipitation, col=cl)
 points(presence)
 # intermediate percipitation
 
-# now let's make a model 
+## 11.01.22 lecture: making a model ## 
+
+# model will calculate the probability of finding the species in an area without going in the field
+# data used is inside the sdm package
+
+setwd("/Users/viktoriasitnik/Documents/R/lab")
+# source function: source causes R to accept its input from the named file or URL or connection or expressions directly. 
+
+source("R_code_source_sdm.r")
+
+# graphs from past lectures appear
+
+preds # our predictories: elevation, precipitation, temperature, vegetation 
+# explain to the software the data used 
+# sdmData: creates a sdmdata objects that holds species (single or multiple) and explanatory variates. 
+# train- species
+sdmData(train=species, predictors=preds)
+data.sdm <-sdmData(train=species, predictors=preds)
+data.sdm
+
+# sdm: Fits sdm for single or multiple species using single or multiple methods specified by a user in methods argument, and evaluates their performance.
+library(sdm)
+
+# formula = is actually default, no need to add it 
+model1 <- sdm(Occurrence~temperature+elevation+precipitation+vegetation, data=data.sdm, methods="glm")
+m1
+# the model is based on linear function y= bx+ a
+
+
