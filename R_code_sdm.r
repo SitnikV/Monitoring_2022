@@ -97,4 +97,30 @@ model1 <- sdm(Occurrence~temperature+elevation+precipitation+vegetation, data=da
 m1
 # the model is based on linear function y= bx+ a
 
+## 12.01.2022 lecture ##
+# predict - model you are using + data 
+
+p1 <-predict(model1, newdata=preds) # predictions 1
+plot(p1, col=cl)
+# values 0 (low probability) -1 (high probability)
+# test goodness of fit by plotting the presences on the map 
+points(presences, pch=17)
+
+# most of the points are located in the areas with higher probability
+# in eastern part it is not so accurate
+# might be due to predictor that is not considered in this model 
+
+# make final stack to summarise everything
+# stack: Stacking vectors concatenates multiple vectors into a single vector along with a factor indicating where each observation originated. Unstacking reverses this operation.
+
+s1 <-stack(preds, p1)
+s1 <- stack(preds, p1)
+plot(s1, col=cl)
+
+# change all the graph titles/names (of s1)
+names(s1) <- c('Elevation', 'Precipitation', 'Temperature', 'Vegetation', 'Model')
+plot(s1, col=cl)
+
+
+
 
