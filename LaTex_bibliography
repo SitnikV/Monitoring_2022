@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\title{bibliography}
+\tableofcontents
+\author{v-sitnik }
+\date{January 2022}
+\usepackage{natbib}
+\begin{document}
+\section{Introduction}
+Problems are part of statistics. \cite{zuur_2010}
+In biological conservation focus groups of scientists are crucial \cite{ochieng_2018}.
+\section{methods}
+\begin{equation}
+ H = 3 \times 2 
+\label{eq:moltiplica}
+\end{equation}
+\begin{equation}
+ H = - \sum_{i=1}^{6} p_i \times \log{p_{ijm}}
+\label{eq:shannon}
+\end{equation}
+\lstinputlisting{R_code_today.r} % that is the code in the file R_code_today.r
+\begin{thebibliography}{2010}
+\bibitem{zuur_2010}
+Zuur, A.F., Ieno, E.N. and Elphick, C.S. (2010), A protocol for data exploration to avoid common statistical problems. Methods in Ecology and Evolution, 1: 3-14. https://doi.org/10.1111/j.2041-210X.2009.00001.x
+\bibitem{ochieng_2018}[Ochieng et al.,2018]
+Ochieng, NT, Wilson, K, Derrick, CJ, Mukherjee, N. The use of focus group discussion methodology: Insights from two decades of application in conservation. Methods Ecol Evol. 2018; 9: 20– 32. https://doi.org/10.1111/2041-210X.12860
+\end{thebibliography}
+
+\begin{itemize}
+
+\item{ecosystem monitoring at large scale by remote sensing.}
+\item{community ecology by multivariate analysis.}
+\end{itemize}
