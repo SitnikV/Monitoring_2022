@@ -97,6 +97,7 @@ fj14 <-ggplot() + geom_raster(fj14_estonia,mapping = aes(x=x ,y=y, fill=Fraction
   scale_fill_viridis(option="viridis") + ggtitle("Fpar 24.01.2014")
 fj14
 
+# following steps could have also been done faster by creating a stack from a list and then later the stack could be plotted.
 fparmar14 <- raster("c_gls_FAPAR_201403130000_GLOBE_VGT_V1.4.1.nc") 
 fm14_estonia <-crop(fparmar14,ext)
 plot(fm14_estonia)
