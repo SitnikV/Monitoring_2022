@@ -17,23 +17,25 @@ library(rgdal) # to select spatial extension (Estonia)
 snowcover <- list.files(pattern="SCE")
 snowcover
 
+# with list files I created a list of files by using common name in the files names from the folder set into the working directory
 # now the lists are created within every category I can pick certain layer using square brackets
-# lapply allows to apply a function to all files within a list
+# lapply allows to apply a function to all files within a list, in this case i apply "raster" function
 
 list_snow <-lapply(snowcover,raster) # raster because it's a single layer file
 list_snow
-
 
 # however I will need to work on each layer separately and to have shorter names 
 # use extent function from rgdal package to select spatial extension
 # individual plotting of each dataset is just out of personal interest
 
 snowjan20 <- raster("c_gls_SCE_202001090000_NHEMI_VIIRS_V1.0.1.nc") 
+# here the "raster" function is used to create raster layer objects
 
 plot(snowjan20) # plot to choose spatial extent from x and y axis
-# may need to play around with numbers until the "perfect" fit is found
+
 
 # crop to the extent of Estonia
+# may need to play around with numbers until the "perfect" fit is found
  # x and y axis coordinates for latitude and longitude
 ext <- extent(c(21, 28, 57, 60))
 
@@ -143,9 +145,9 @@ am20_estonia <-crop(aldhmar20,ext)
 #### spatial correlation between rasters ###
 
 
-install.packages("spatialEco")
+install.packages("spatialEco") # spatial analysis and modelling utilities. Functions include models for species population density, download utilities for climate and global deforestation spatial products etc...
 library(raster)
-library(spatialEco)
+library(spatialEco) # here used for calculating spatial correlation
 
 cl <- colorRampPalette(c("blue","green","pink","yellow"))(100) # colors of the plot
 
@@ -175,7 +177,7 @@ cor_jan20 <- rasterCorrelation(fj20_estonia, aj20_estonia,s=3,type = "pearson")
 plot(fm20_estonia)
 cor_mar20 <-rasterCorrelation(fm20_estonia, am20_estonia,s=3,type = "pearson")
 
-par(mfrow=c(3,2))
+par(mfrow=c(3,2)) # organising images into 3 rows and two columns 
 plot(cor_jan14, xlab = "latitude", ylab="longitude",col=cl,main="January 2014")
 plot(cor_mar14, xlab = "latitude", ylab="longitude",col=cl,main=" March 2014")
 plot(cor_jan18, xlab = "latitude", ylab="longitude",col=cl,main=" January 2018")
@@ -205,6 +207,18 @@ ps_summer <- list_rast[[1]]
 ps_winter <- list_rast[[2]]
 
 plotRGB(ps_summer, r=1, g=2, b=3, stretch="lin")
+
+# (stretch = "lin"), because When the range of pixel brightness values is closer to 0, a darker image is rendered by default...
+# (stretch = "lin") ...We can stretch the values to extend to the full 0-255 range of potential values to increase the visual contrast of the image.
+# (stretch = "lin") ... When the range of pixel brightness values is closer to 255, a lighter image is rendered by default. 
+# ...We can stretch the values to extend to the full 0-255 range of potential values to increase the visual contrast of the image.
+
+
+# Description
+
+# (about plot RGB) Make a Red-Green-Blue plot based on three layers (in a RasterBrick or RasterStack). 
+# (about plot RGB) Three layers (sometimes referred to as "bands" because they may represent different bandwidths in the electromagnetic spectrum) are combined such that they represent the red, green and blue channel.
+# (about plot RGB) This function can be used to make 'true (or false) color images' from Landsat and other multi-band satellite images.
 
 # unsupervised to let the software run the analysis
 ps_summer_c <- unsuperClass(ps_summer, nClasses = 2) # unsuperClass (x, nClasses)
